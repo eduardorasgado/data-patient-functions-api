@@ -141,23 +141,23 @@ app.delete('/paciente/basic/:patientId', (req, res) => {
                         pacientesBasicDataCollection,
                         req.params.patientId
                     )
+                    .then((sucess:any) =>{
+                        if(sucess.status){
+                            res.send({
+                                status: 'success',
+                                message: 'Tus datos basicos han sido reseteados'
+                            });
+                        } else {
+                            res.send({
+                                status: 'error',
+                                message: 'Error al tratar de eliminar tus datos'
+                            });
+                        }
+                    });
             } else {
                 res
                 .status(404)
                 .send({status: "error", message: "No existe el paciente"});
             }
         })
-        .then((sucess:any) =>{
-            if(sucess.status){
-                res.send({
-                    status: 'sucess',
-                    message: 'Tus datos basicos han sido reseteados'
-                });
-            } else {
-                res.send({
-                    status: 'error',
-                    message: 'Error al tratar de eliminar tus datos'
-                });
-            }
-        });
 });
