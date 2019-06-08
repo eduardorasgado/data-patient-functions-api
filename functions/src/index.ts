@@ -50,29 +50,29 @@ app.post('/paciente/basic', (req, res) => {
      *  peso
      *  genero_conviccion
      */
-    if(req.body != null) {
+    let body:any = req.body;
+    if(body != null) {
         firebaseHelper.firestore
-            .createNewDocumentWithID(
+            .createDocumentWithID(
                 db, 
                 pacientesBasicDataCollection, 
                 // id del documento
-                req.body.paciente_id,
+                body.paciente_id,
                 {
-                    'estatura': req.body.estatura,
-                    'peso': req.body.peso,
-                    'genero_conviccion': req.body.genero_conviccion
+                    'estatura': body.estatura,
+                    'peso': body.peso,
+                    'genero_conviccion': body.genero_conviccion
                 }
             )
-            .then((doc:object) => 
-            res.send({
-                status: 'success',
-                message:'Datos del paciente han sido guardados'
-            }))
+            .then((response:any) => {
+                res.send({status: 'success', message: 'Datos ingresados correctamente'})
+            })
             .catch((error:any) =>{
                 res.send({status: 'error', message: 'Datos mal estructurados'});
             });
+    } else {
+        res.send({status: 'error', message: 'No se recibió ningún dato'});
     }
-    res.send({status: 'error', message: 'Datos mal estructurados'})
 });
 
 /**
@@ -104,16 +104,22 @@ app.patch('/paciente/basic/:patientId', (req, res) => {
  */
 app.get('/paciente/basic/:patientId', (req, res) => {
     firebaseHelper.firestore
-        .getDocument(
+        .checkDocumentExists(
             db,
             pacientesBasicDataCollection,
             req.params.patientId
         )
-        .then((document:object) => {
-            res
+        .then((document:any) => {
+            if(document.exists){
+                res
                 .status(200)
-                .send(document);
-        })
+                .send(document.data);
+            } else {
+                res
+                .status(404)
+                .send({status: "error", message: "No existe el paciente"});
+            }
+        });
 });
 
 /**
@@ -122,11 +128,25 @@ app.get('/paciente/basic/:patientId', (req, res) => {
  */
 app.delete('/paciente/basic/:patientId', (req, res) => {
     firebaseHelper.firestore
-        .deleteDocument(
+        .checkDocumentExists(
             db,
             pacientesBasicDataCollection,
             req.params.patientId
         )
+        .then((document:any) => {
+            if(document.exists){
+                firebaseHelper.firestore
+                    .deleteDocument(
+                        db,
+                        pacientesBasicDataCollection,
+                        req.params.patientId
+                    )
+            } else {
+                res
+                .status(404)
+                .send({status: "error", message: "No existe el paciente"});
+            }
+        })
         .then((sucess:any) =>{
             if(sucess.status){
                 res.send({
@@ -139,7 +159,5 @@ app.delete('/paciente/basic/:patientId', (req, res) => {
                     message: 'Error al tratar de eliminar tus datos'
                 });
             }
-        })
-        
-        
+        });
 });
