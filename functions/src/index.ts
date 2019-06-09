@@ -515,3 +515,25 @@ app.post('/paciente/public', (req, res) => {
 	}
 });
 
+app.get('/paciente/public/:pacienteId', (req, res) => {
+    firebaseHelper.firestore
+        .checkDocumentExists(
+            db,
+            publicDataCollection,
+            req.params.pacienteId
+        )
+        .then((document:any) => {
+            if(document.exists){
+                res
+                    .status(200)
+                    .send(document.data);
+            } else {
+                res
+                    .status(404)
+                    .send({
+                        status: 'error',
+                        message:'Los datos publicos que buscas no se encuentran'
+                    });
+            }
+        });
+});
