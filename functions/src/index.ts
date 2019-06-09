@@ -50,7 +50,7 @@ app.post('/paciente/basic', (req, res) => {
      *  peso
      *  genero_conviccion
      */
-    let body:any = req.body;
+    const body:any = req.body;
     if(body != null) {
         firebaseHelper.firestore
             .createDocumentWithID(
