@@ -11,7 +11,15 @@ import * as bodyParser from 'body-parser';
 //  response.send("Hello from Firebase!");
 // });
 
-admin.initializeApp(functions.config().firebase);
+var serviceAccount = require("./mediworld-backend-firebase-adminsdk-jc9pf-e5e3ee322f.json");
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://mediworld-backend.firebaseio.com"
+  },functions.config().firebase);
+
+// llamando la llave para insertar datos en firebase
+
 
 const db = admin.firestore();
 
