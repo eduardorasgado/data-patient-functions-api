@@ -120,7 +120,8 @@ app.get('/paciente/basic/:patientId', (req, res) => {
             } else {
                 res
                 .status(404)
-                .send({status: "error", message: "No existe el paciente"});
+                .send({status: "error",
+                message: "Paciente aun no tiene datos personales"});
             }
         });
 });
@@ -153,14 +154,15 @@ app.delete('/paciente/basic/:patientId', (req, res) => {
                         } else {
                             res.send({
                                 status: 'error',
-                                message: 'Error al tratar de eliminar tus datos'
+                                message: 'Error al tratar de eliminar tus datos básicos'
                             });
                         }
                     });
             } else {
                 res
                 .status(404)
-                .send({status: "error", message: "No existe el paciente"});
+                .send({status: "error", 
+                message: "Paciente aun no tiene datos básicos"});
             }
         })
 });
@@ -256,7 +258,7 @@ app.patch('/paciente/personal/:pacienteId', (req, res) => {
                    .status(404)
                    .send({
                        status: 'error',
-                       message: 'No existe el paciente'
+                       message: 'Paciente aun no tiene datos personales'
                    });
            }
        });
@@ -324,7 +326,7 @@ app.delete('/paciente/personal/:pacienteId', (req, res) => {
                    .status(404)
                    .send({
                        status: 'error',
-                       message: 'No existe el paciente'
+                       message: 'Paciente aun no tiene datos personales'
                    });
            }
        });
@@ -423,7 +425,7 @@ app.get("/paciente/alergiasyantecedentes/:pacienteId", (req, res) => {
                     .status(404)
                     .send({
                         status: "error",
-                        message: "No existe el paciente"
+                        message: "Paciente aun no tiene datos de alergias y antecedentes"
                     });
             }
         });
@@ -465,7 +467,7 @@ app.delete("/paciente/alergiasyantecedentes/:pacienteId", (req, res) => {
             } else {
                 res
                     .status(404)
-                    .send('No existe el paciente');
+                    .send('Paciente aun no tiene datos de alergias y antecedentes');
             }
         });
 });
@@ -473,7 +475,9 @@ app.delete("/paciente/alergiasyantecedentes/:pacienteId", (req, res) => {
 
 // inicio de CRUD y RUTAS PARA MOSTRAR LOS DATOS PUBLICOS DEL PACIENTE
 
-
+/**
+ * Metodo para agregar nuevos datos publicos de un determinado paciente
+ */
 app.post('/paciente/public', (req, res) => {
 	const body = req.body;
 	if(body != null){
@@ -515,6 +519,9 @@ app.post('/paciente/public', (req, res) => {
 	}
 });
 
+/**
+ * Metodo para conseguir los datos publicos de un determinado paciente
+ */
 app.get('/paciente/public/:pacienteId', (req, res) => {
     firebaseHelper.firestore
         .checkDocumentExists(
@@ -536,4 +543,72 @@ app.get('/paciente/public/:pacienteId', (req, res) => {
                     });
             }
         });
+});
+
+/**
+ * Metodo para actualizar los datos publicos de un paciente
+ */
+app.patch("/paciente/public/:pacienteId", (req, res) => {
+    firebaseHelper.firestore
+        .updateDocument(
+            db,
+            publicDataCollection,
+            req.params.pacienteId,
+            req.body
+        )
+        .then((suceess:any) => {
+            res
+                .send({
+                    status: 'success',
+                    message: 'Personalización de datos publicos han sido actualizados'
+                });
+        })
+        .catch((error:any) => {
+            res
+                .send({
+                    status: 'success',
+                    message: 'Personalización de datos publicos no ha podido realizarse'
+                });
+        });
+});
+
+/**
+ * Metodo para eliminar los datos publicos de un paciente
+ */
+app.delete("/paciente/public/:pacienteId", (req, res) => {
+    firebaseHelper.firestore
+        .checkDocumentExists(
+            db,
+            publicDataCollection,
+            req.params.pacienteId
+        )
+        .then((document:any) => {
+            if(document.exists){
+                firebaseHelper.firestore
+                    .deleteDocument(
+                        db,
+                        publicDataCollection,
+                        req.params.pacienteId
+                    )
+                    .then((success:any) => {
+                        if(success.status) {
+                            res.send({
+                                status: 'success',
+                                message: 'Tus configuracion de datos publicos han sido reseteados'
+                            });
+                        } else {
+                            res
+                                .send({
+                                    status: 'error',
+                                    message: 'Error al tratar de resetear tu configuracion de datos publicos'
+                                });
+                        }
+                    });
+            } else {
+                res
+                    .status(404)
+                    .send('No existen datos de configuracion aun');
+            }
+        });
+
 });
