@@ -18,5 +18,8 @@
         "function": "patientsApi"
       }
     ]
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }
